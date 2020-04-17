@@ -1,0 +1,141 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>TEST</title>
+  <script src="CodeBattleJsLibrary.js"></script>
+</head>
+<body id="body">
+  <textarea id="text" readonly=true style="display: block; width: 100%; height: 100%; resize: none;"></textarea>
+  <script type="text/javascript">
+  
+    var isBlock = function(block)
+    {
+      var result = false;
+      result =
+        block == BombermanBlocks.Wall ||
+        block == BombermanBlocks.WallDestroyable ||
+        block == BombermanBlocks.MeatChopper ||
+        block == BombermanBlocks.BombTimer1 ||
+        block == BombermanBlocks.BombTimer2 ||
+        block == BombermanBlocks.BombTimer3 ||
+        block == BombermanBlocks.BombTimer4 ||
+        block == BombermanBlocks.BombTimer5 ||
+        block == BombermanBlocks.OtherBomberman ||
+        block == BombermanBlocks.OtherBombBomberman;
+      return result;
+    };
+
+    var isBomb = function(block){
+      var result = false;
+      result =
+        block == BombermanBlocks.BombTimer1 ||
+        //block == BombermanBlocks.BombTimer2 ||
+        //block == BombermanBlocks.BombTimer3 ||
+        //block == BombermanBlocks.BombTimer4 ||
+        //block == BombermanBlocks.BombTimer5 ||
+        block == BombermanBlocks.OtherBombBomberman;
+      return result;
+    }
+
+    var isBlocked = function(x,y) {
+      if (isBlock(gcb.map[y - 1][x]) 
+        && isBlock(gcb.map[y + 1][x])
+        && isBlock(gcb.map[y][x + 1])
+        && isBlock(gcb.map[y][x - 1]))
+          return true;
+      return false;
+    }
+
+    var setBomb = function(x,y){
+      if((gcb.playerX - bomb_force < x && gcb.playerX + bomb_force > x && y == gcb.playerY) || ( x == gcb.playerX && gcb.playerY - bomb_force < y && gcb.playerY + bomb_force > y)) {
+        text.value +='Взрываем(' + x + ',' + y + ') '
+        return true
+      }
+      return false
+    }
+
+    const bomb_force = 4
+    const scan_size = 5
+    
+    var gcb = new GameClient("server.codebattle.ru:8080", "denis@test.ru", "16289362341366816317")
+    gcb.textArea = text
+    var _available_move = [0,1,2,3]
+    gcb.run(function()
+      {
+        var _a = [];
+        var _x_start = gcb.playerX-scan_size<0?0:gcb.playerX-scan_size;
+        var _y_start = gcb.playerY-scan_size<0?0:gcb.playerY-scan_size;
+        var _x_end =(gcb.playerX+scan_size)>gcb.size?gcb.size:gcb.playerX+scan_size;
+        var _y_end = (gcb.playerY+scan_size)>gcb.size?gcb.size:gcb.playerY+scan_size;
+
+        var done = false;
+        var with_bomb = BombAction.None; 
+
+        text.value+="Position: " + gcb.playerX + ":" + gcb.playerY + " ";
+        for (let _x_index = _x_start; _x_index < _x_end; _x_index++) {
+          for (let _y_index = _y_start; _y_index < _y_end; _y_index++) {
+            const element = gcb.map[_y_index][_x_index];
+
+            if (isBomb(element)) { //Закрываем места потенциального взрыва бомбы, чтобы туда не ходить.
+              //text.value +='Бомба(' + _x_index + ',' + _y_index + ') '
+              let _bx_start = _x_index-bomb_force<0?0:_x_index-bomb_force;
+              let _by_start = _y_index-bomb_force<0?0:_y_index-bomb_force;
+              let _bx_end = _x_index+bomb_force>gcb.size?gcb.size:_x_index+bomb_force;
+              let _by_end = _y_index+bomb_force>gcb.size?gcb.size:_y_index+bomb_force;
+              for (let _bx_index = _bx_start; _bx_index < _bx_end; _bx_index++) {
+                gcb.map[_y_index][_bx_index] = BombermanBlocks.Wall;
+              }
+              for (let _by_index = _by_start; _by_index < _by_end; _by_index++) {
+                gcb.map[_by_index][_x_index] = BombermanBlocks.Wall;
+              }
+            }
+            if (with_bomb == BombAction.None && element == BombermanBlocks.WallDestroyable || element == BombermanBlocks.OtherBomberman || element == BombermanBlocks.MeatChopper) {
+              with_bomb = setBomb(_x_index,_y_index)?BombAction.BeforeTurn:BombAction.None;
+            }
+          }
+        }
+        
+        if (isBlocked(gcb.playerX,gcb.playerY))
+        {
+          text.value += 'Заблокирован '
+          gcb.act();
+          done = true;
+        }else{
+          //уходим с занятого места
+          if (isBlock(gcb.map[gcb.playerY][gcb.playerX])) {
+            text.value += 'Стоим на запрещенном месте ';
+            if (isBlock(gcb.map[gcb.playerY - 1][gcb.playerX]) == false) { 
+              gcb.up(with_bomb);
+              done = true; 
+            } else if (isBlock(gcb.map[gcb.playerY][gcb.playerX + 1]) == false) { 
+              gcb.right(with_bomb); 
+              done = true; 
+            } else if (isBlock(gcb.map[gcb.playerY + 1][gcb.playerX]) == false) { 
+              gcb.down(with_bomb);  
+              done = true;
+            } else if (isBlock(gcb.map[gcb.playerY][gcb.playerX - 1]) == false) { 
+              gcb.left(with_bomb);  
+              done = true; 
+            };
+          }
+
+          //идем туда где не занято
+          if (done == false){
+            text.value += "Cлучайный ход "
+            switch (_available_move[Math.round(Math.random() * _available_move.length - 0.5)])
+            {
+              case 0: if (isBlock(gcb.map[gcb.playerY - 1][gcb.playerX]) == false) { gcb.up(with_bomb);    done = true; _available_move = [0,1,3]; } break;
+              case 1: if (isBlock(gcb.map[gcb.playerY][gcb.playerX + 1]) == false) { gcb.right(with_bomb); done = true; _available_move = [0,1,2]; } break;
+              case 2: if (isBlock(gcb.map[gcb.playerY + 1][gcb.playerX]) == false) { gcb.down(with_bomb);  done = true; _available_move = [1,2,3]; } break;
+              case 3: if (isBlock(gcb.map[gcb.playerY][gcb.playerX - 1]) == false) { gcb.left(with_bomb);  done = true; _available_move = [0,2,3]; } break;
+            }
+          }
+
+          if (done == false)
+            with_bomb?gcb.act():gcb.blank();
+        } //заблокирован
+      }
+    );
+  </script>
+</body>
+</html>
