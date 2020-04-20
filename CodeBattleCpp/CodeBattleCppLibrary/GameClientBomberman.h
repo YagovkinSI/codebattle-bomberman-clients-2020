@@ -29,7 +29,7 @@ class GameClientBomberman
 	void update_func(std::function<void()> _message_handler);
 
 public:
-	GameClientBomberman(std::string _server, std::string _userEmail, std::string _userPassword = "");
+	GameClientBomberman(std::string _server);
 	~GameClientBomberman();
 
 	void Run(std::function<void()> _message_handler);

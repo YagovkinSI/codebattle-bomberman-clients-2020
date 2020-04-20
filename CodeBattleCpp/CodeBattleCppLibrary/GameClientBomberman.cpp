@@ -2,13 +2,14 @@
 
 #include <iostream>
 
-GameClientBomberman::GameClientBomberman(std::string _server, std::string _userEmail, std::string _code)
+GameClientBomberman::GameClientBomberman(std::string _server)
 {
 	map = nullptr;
+	board = nullptr;
 	map_size = 0;
-
-	path = "ws://" + _server + "/codenjoy-contest/ws?user=" + _userEmail + "&code=" + _code;
-
+	path = _server.replace(_server.find("http"), sizeof("http")-1, "ws");
+	path = path.replace(path.find("board/player/"),sizeof("board/player/")-1,"ws?user=");
+	path = path.replace(path.find("?code="),sizeof("?code=")-1,"&code=");
 	is_running = false;
 }
 

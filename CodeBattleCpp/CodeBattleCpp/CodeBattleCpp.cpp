@@ -21,7 +21,7 @@ bool is_block(BombermanBlocks _block)
 void main()
 {
 	srand(time(0));
-	GameClientBomberman *gcb = new GameClientBomberman("localhost:8080", "e@mail.org", "00000000000000000000");
+	GameClientBomberman *gcb = new GameClientBomberman("http://localhost:8080/codenjoy-contest/board/player/82bc5roztht315o8f5yc?code=3242242588940318227&gameName=snakebattle");
 	gcb->Run([&]()
 	{
 		BombermanBlocks **map = gcb->get_map();

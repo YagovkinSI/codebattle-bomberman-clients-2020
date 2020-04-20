@@ -1,12 +1,15 @@
-## Prerequisites:
+bomberman
+=========
 
-```pip install -e .```
+websocket client app for Codenjoy Bomberman
 
-*You need `pip` to be installed first*
+Designed to be run with python3
+Depends on websocket-client from https://github.com/liris/websocket-client/blob/py3/websocket.py
 
-## Usage:
+To connect to the game server:
+1. Sign up. If you did everything right, you'll get to the main game board.
+2. Click on your name on the right hand side panel
+3. Copy the whole link from the browser, go to main.py and paste it to the main() method, now you're good to go!
 
-Run client form command line:
-```
-bombermanclient
-```
+The bomberman actions logic should be extended by modifying the find_direction method in dds.py
+or by calling your own method from get() in the same dds.py
