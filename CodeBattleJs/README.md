@@ -4,8 +4,8 @@ Registration:
         * server = server_host_ip:8080 server ip inside your LAN
         * server = codenjoy.com if you play on http://codenjoy.com/codenjoy-contest
 - register your hero on server http://server/codenjoy-contest/register
-- copy board page browser url from address bar and paste into url variable of Runner.js
-- write your own bot at 'get' function
+- copy board page browser url from address bar and paste into url variable of Configuration.js
+- write your own bot at 'get' function in the Solver.js
 
 For JavaScript with browser:
 - write bot
