@@ -19,6 +19,9 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
+var module;
+
 var printBoardOnTextArea = function(data) {
     var textarea = document.getElementById("board");
     if (!textarea) return;
@@ -93,4 +96,4 @@ var require = function(string) {
             }
         }
     }
-}
+};

@@ -2,7 +2,7 @@
  * #%L
  * Codenjoy - it's a dojo-like platform from developers to developers.
  * %%
- * Copyright (C) 2018 Codenjoy
+ * Copyright (C) 2018 - 2020 Codenjoy
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -20,203 +20,22 @@
  * #L%
  */
 
-// you can get this code after registration on the server with your email
-var url = "http://codingdojo2020.westeurope.cloudapp.azure.com/codenjoy-contest/board/player/x3xv9fth1la4szy6ut8c?code=1911587787919115109&gameName=bomberman";
-
+var Point;
 var util = require('util');
-var WSocket = require('ws');
-
-var log = function(string) {
-    console.log(string);
-    if (!!printBoardOnTextArea) {
-        printLogOnTextArea(string);
-    }
-};
-
 var printArray = function (array) {
-   var result = [];
-   for (var index in array) {
-       var element = array[index];
-       result.push(element.toString());
-   }
-   return "[" + result + "]";
-};
-
-var processBoard = function(boardString) {
-    var board = new Board(boardString);
-        if (!!printBoardOnTextArea) {
-        printBoardOnTextArea(board.boardAsString());
+    var result = [];
+    for (var index in array) {
+        var element = array[index];
+        result.push(element.toString());
     }
+    return "[" + result + "]";
+ };
 
-    var logMessage = board + "\n\n";
-    var answer = new DirectionSolver(board).get().toString();
-    logMessage += "Answer: " + answer + "\n";
-    logMessage += "-----------------------------------\n";
-    
-    log(logMessage);
-
-    return answer;
-};
-
-
-url = url.replace("http", "ws");
-url = url.replace("board/player/", "ws?user=");
-url = url.replace("?code=", "&code=");
-
-var ws;
-
-function connect() {
-    ws = new WSocket(url);
-    log('Opening...');
-
-    ws.on('open', function() {
-        log('Web socket client opened ' + url);
-    });
-
-    ws.on('close', function() {
-        log('Web socket client closed');
-
-        setTimeout(function() {
-            connect();
-        }, 5000);
-    });
-
-    ws.on('message', function(message) {
-        var pattern = new RegExp(/^board=(.*)$/);
-        var parameters = message.match(pattern);
-        var boardString = parameters[1];
-        var answer = processBoard(boardString);
-        ws.send(answer);
-    });
-}
-
-connect();
-
-var Element = {
-    /// This is your Bomberman
-    BOMBERMAN : '☺',             // this is what he usually looks like
-    BOMB_BOMBERMAN : '☻',        // this is if he is sitting on own bomb
-    DEAD_BOMBERMAN : 'Ѡ',        // oops, your Bomberman is dead (don't worry, he will appear somewhere in next move)
-
-    /// this is other players Bombermans
-    OTHER_BOMBERMAN : '♥',       // this is what other Bombermans looks like
-    OTHER_BOMB_BOMBERMAN : '♠',  // this is if player just set the bomb
-    OTHER_DEAD_BOMBERMAN : '♣',  // enemy corpse (it will disappear shortly, right on the next move)
-
-    /// the bombs
-    BOMB_TIMER_5 : '5',          // after bomberman set the bomb, the timer starts (5 tacts)
-    BOMB_TIMER_4 : '4',          // this will blow up after 4 tacts
-    BOMB_TIMER_3 : '3',          // this after 3
-    BOMB_TIMER_2 : '2',          // two
-    BOMB_TIMER_1 : '1',          // one
-    BOOM : '҉',                  // Boom! this is what is bomb does, everything that is destroyable got destroyed
-
-    /// walls
-    WALL : '☼',                  // indestructible wall - it will not fall from bomb
-    DESTROYABLE_WALL : '#',      // this wall could be blowed up
-    DESTROYED_WALL : 'H',        // this is how broken wall looks like, it will dissapear on next move
-
-    /// meatchoppers
-    MEAT_CHOPPER : '&',          // this guys runs over the board randomly and gets in the way all the time
-                                 // if it will touch bomberman - it will die
-    DEAD_MEAT_CHOPPER : 'x',     // this is chopper corpse
-
-    /// a void
-    NONE : ' '                  // this is the only place where you can move your Bomberman
-};
-
-var D = function(index, dx, dy, name){
-
-    var changeX = function(x) {
-        return x + dx;
-    };
-
-    var changeY = function(y) {
-        return y - dy;
-    };
-
-    var inverted = function() {
-        switch (this) {
-            case Direction.UP : return Direction.DOWN;
-            case Direction.DOWN : return Direction.UP;
-            case Direction.LEFT : return Direction.RIGHT;
-            case Direction.RIGHT : return Direction.LEFT;
-            default : return Direction.STOP;
-        }
-    };
-
-    var toString = function() {
-        return name;
-    };
-
-    return {
-        changeX : changeX,
-
-        changeY : changeY,
-
-        inverted : inverted,
-
-        toString : toString,
-
-        getIndex : function() {
-            return index;
-        }
-    };
-};
-
-var Direction = {
-    UP : D(2, 0, 1, 'up'),                 // you can move
-    DOWN : D(3, 0, -1, 'down'),
-    LEFT : D(0, -1, 0, 'left'),
-    RIGHT : D(1, 1, 0, 'right'),
-    ACT : D(4, 0, 0, 'act'),                // drop bomb
-    STOP : D(5, 0, 0, '')                   // stay
-};
-
-Direction.values = function() {
-   return [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT, Direction.ACT, Direction.STOP];
-};
-
-Direction.valueOf = function(index) {
-    var directions = Direction.values();
-    for (var i in directions) {
-        var direction = directions[i];
-        if (direction.getIndex() == index) {
-             return direction;
-        }
-    }
-    return Direction.STOP;
-};
-
-var Point = function (x, y) {
-    return {
-        equals : function (o) {
-            return o.getX() == x && o.getY() == y;
-        },
-
-        toString : function() {
-            return '[' + x + ',' + y + ']';
-        },
-
-        isOutOf : function(boardSize) {
-            return x >= boardSize || y >= boardSize || x < 0 || y < 0;
-        },
-
-        getX : function() {
-            return x;
-        },
-
-        getY : function() {
-            return y;
-        }
-    }
-};
-
-var pt = function(x, y) {
+var pt = function (x, y) {
     return new Point(x, y);
 };
 
-var LengthToXY = function(boardSize) {
+var LengthToXY = function (boardSize) {
     function inversionY(y) {
         return boardSize - 1 - y;
     }
@@ -226,7 +45,7 @@ var LengthToXY = function(boardSize) {
     }
 
     return {
-        getXY : function(length) {
+        getXY: function (length) {
             if (length == -1) {
                 return null;
             }
@@ -234,11 +53,20 @@ var LengthToXY = function(boardSize) {
             var y = inversionY(Math.trunc(length / boardSize));
             return new Point(x, y);
         },
+        getXYExtended: function (length, element) {
+            if (length == -1) {
+                return null;
+            }
+            var x = inversionX(length % boardSize);
+            var y = inversionY(Math.trunc(length / boardSize));
+            return new Point(x, y, element);
+        },
 
-        getLength : function(x, y) {
+
+        getLength: function (x, y) {
             var xx = inversionX(x);
             var yy = inversionY(y);
-            return yy*boardSize + xx;
+            return yy * boardSize + xx;
         }
     };
 };
@@ -465,25 +293,4 @@ var Board = function(board){
    };
 };
 
-var random = function(n){
-    return Math.floor(Math.random()*n);
-};
-
-var direction;
-
-var DirectionSolver = function(board){
-
-    return {
-        /**
-         * @return next hero action
-         */
-        get : function() {
-            var bomberman = board.getBomberman();
-
-            // TODO your code here
-
-            return Direction.ACT;
-        }
-    };
-};
-
+if(module) module.exports = Board;
