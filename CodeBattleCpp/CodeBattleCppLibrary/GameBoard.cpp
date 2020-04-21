@@ -111,6 +111,7 @@ std::list<BoardPoint> GameBoard::getBarriers() {
 	result.splice(result.end(), findAllElements(BoardElement::BOMB_TIMER_5));
 	result.splice(result.end(), findAllElements(BoardElement::WALL_DESTROYABLE));
 	result.splice(result.end(), findAllElements(BoardElement::OTHER_BOMBERMAN));
+	result.splice(result.end(), findAllElements(BoardElement::OTHER_BOMB_BOMBERMAN));
 	return result;
 }
 
