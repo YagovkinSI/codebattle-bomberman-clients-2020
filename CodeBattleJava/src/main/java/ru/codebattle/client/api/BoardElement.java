@@ -1,7 +1,11 @@
-package ru.codebattle.client.domain;
+package ru.codebattle.client.api;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public enum BombermanBlock {
+@RequiredArgsConstructor
+@Getter
+public enum BoardElement {
     /// This is your Bomberman
     BOMBERMAN('☺'),             // this is what he usually looks like
     BOMB_BOMBERMAN('☻'),        // this is if he is sitting on own bomb
@@ -38,34 +42,20 @@ public enum BombermanBlock {
     /// a void
     NONE(' ');                 // this is the only place where you can move your Bomberman
 
-    public final static String BOMBS = "12345";
 
-    final char ch;
-
-    BombermanBlock(char ch) {
-        this.ch = ch;
-    }
-
-    public char ch() {
-        return ch;
-    }
+    final char symbol;
 
     @Override
     public String toString() {
-        return String.valueOf(ch);
+        return String.valueOf(symbol);
     }
 
-    public static BombermanBlock valueOf(char ch) {
-        for (BombermanBlock el : BombermanBlock.values()) {
-            if (el.ch == ch) {
+    public static BoardElement valueOf(char ch) {
+        for (BoardElement el : BoardElement.values()) {
+            if (el.symbol == ch) {
                 return el;
             }
         }
         throw new IllegalArgumentException("No such element for " + ch);
     }
-
-    public boolean isBomb() {
-        return BOMBS.indexOf(ch) != -1;
-    }
-
 }

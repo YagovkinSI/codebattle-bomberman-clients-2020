@@ -5,17 +5,17 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
-mainClassName = 'ru.codebattle.client.CodeBattleJava'
+mainClassName = 'ru.codebattle.client.Main'
 
 jar {
     manifest {
-        attributes "Main-Class": "ru.codebattle.client.CodeBattleJava"
+        attributes "Main-Class": "ru.codebattle.client.Main"
     }
 
     from {
@@ -28,8 +28,10 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'ch.qos.logback:logback-classic:1.0.1'
     compile 'ch.qos.logback:logback-core:1.0.1'
-
     compile 'commons-lang:commons-lang:2.6'
-
-    compileOnly "org.projectlombok:lombok:1.16.16"
+    compileOnly "org.projectlombok:lombok:1.18.10"
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
