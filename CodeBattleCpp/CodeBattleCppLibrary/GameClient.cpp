@@ -1,8 +1,7 @@
-#include "GameClientBomberman.h"
-
+#include "GameClient.h"
 #include <iostream>
 
-GameClientBomberman::GameClientBomberman(std::string _server)
+GameClient::GameClient(std::string _server)
 {
 	map = nullptr;
 	board = nullptr;
@@ -13,19 +12,19 @@ GameClientBomberman::GameClientBomberman(std::string _server)
 	is_running = false;
 }
 
-GameClientBomberman::~GameClientBomberman()
+GameClient::~GameClient()
 {
 	is_running = false;
 	work_thread->join();
 }
 
-void GameClientBomberman::Run(std::function<void()> _message_handler)
+void GameClient::Run(std::function<void()> _message_handler)
 {
 	is_running = true;
-	work_thread = new std::thread(&GameClientBomberman::update_func, this, _message_handler);
+	work_thread = new std::thread(&GameClient::update_func, this, _message_handler);
 }
 
-void GameClientBomberman::update_func(std::function<void()> _message_handler)
+void GameClient::update_func(std::function<void()> _message_handler)
 {
 #ifdef _WIN32
 	WSADATA wsaData;
@@ -58,33 +57,29 @@ void GameClientBomberman::update_func(std::function<void()> _message_handler)
 				}
 				map_size = size;
 
-				map = new BombermanBlocks*[map_size];
+				map = new BoardElement*[map_size];
 				for (uint32_t j = 0; j < map_size; j++)
 				{
-					map[j] = new BombermanBlocks[map_size];
+					map[j] = new BoardElement[map_size];
 					for (uint32_t i = 0; i < map_size; i++)
 					{
-						map[j][i] = BombermanBlocks::Unknown;
+						map[j][i] = BoardElement::NONE;
 					}
 				}
 			}
-
+			
 			uint32_t chr = 6;
 			for (uint32_t j = 0; j < map_size; j++)
 			{
 				for (uint32_t i = 0; i < map_size; i++)
 				{
-					map[j][i] = (BombermanBlocks)wmessage[chr];
+					map[j][i] = (BoardElement)wmessage[chr];
 					chr++;
-
-					if (map[j][i] == BombermanBlocks::Bomberman || map[j][i] == BombermanBlocks::BombBomberman || map[j][i] == BombermanBlocks::DeadBomberman)
-					{
-						player_x = i;
-						player_y = j;
-					}
+					
 				}
 			}
-
+			board = new GameBoard(map, map_size);
+			std::cout << board << '\n';
 			_message_handler();
 		});
 	}

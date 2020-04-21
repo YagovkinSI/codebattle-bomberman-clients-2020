@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include<cstdint>
 
-enum class BombAction : uint8_t
+enum class TurnAction : uint8_t
 {
 	None = 0,
 	BeforeTurn = 1,
