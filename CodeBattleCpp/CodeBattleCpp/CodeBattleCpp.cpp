@@ -7,9 +7,9 @@ void main()
 {
 	srand(time(0));
 
-	//После регистрации на сайте вы попадаете на свою игроую доску. Вставьте URL из строки браузера для инициализации клиента. 
+	//После регистрации на сайте вы попадаете на свою игровую доску. Вставьте URL из строки браузера для инициализации клиента. 
 	//ВАЖНО: В строке должны быть обязательно ид игрока (в примере: 82bc5roztht315o8f5yc) и код (в примере: 3242242588940318227)
-	GameClient *gcb = new GameClient("http://localhost:8080/codenjoy-contest/board/player/82bc5roztht315o8f5yc?code=3242242588940318227&gameName=snakebattle");
+	GameClient *gcb = new GameClient("http://localhost:8080/codenjoy-contest/board/player/82bc5roztht315o8f5yc?code=3242242588940318227&gameName=bomberman");
 	gcb->Run([&]()
 	{
 			//Используем реализованную библиотеку, которая описывает игровую доску. Вы можете ее модифицировать по вашему смотрению.
@@ -21,11 +21,10 @@ void main()
 			{
 				bomb.print();
 			}
-			//
 
 			bool done = false; //Вам обязательно надо слать команду на сервер, даже если вы ничего не сделали
 			switch (rand() % 12) {
-				case 0: gcb->Up(); done = true; break; //Одиночкая команда
+				case 0: gcb->Up(); done = true; break; //Одиночная команда
 				case 1: gcb->Down(); done = true; break;
 				case 2: gcb->Right(); done = true; break;
 				case 3: gcb->Left(); done = true; break;

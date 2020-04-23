@@ -16,7 +16,7 @@ class Board:
         return self.find_first_element(Element('BOMBERMAN'), Element('DEAD_BOMBERMAN'), Element('BOMB_BOMBERMAN'))
 
     def get_other_bombermans(self):
-        return self.find_first_element(Element('OTHER_BOMBERMAN'), Element('OTHER_DEAD_BOMBERMAN'), Element('OTHER_BOMB_BOMBERMAN'))
+        return self._find_all(Element('OTHER_BOMBERMAN'), Element('OTHER_DEAD_BOMBERMAN'), Element('OTHER_BOMB_BOMBERMAN'))
 
     def get_walls(self):
         return self._find_all(Element('WALL'))

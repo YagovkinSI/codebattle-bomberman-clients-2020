@@ -19,7 +19,6 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-var counter = -1;
 var Solver =function (Direction, Element) {
     return {
         /**
@@ -29,17 +28,7 @@ var Solver =function (Direction, Element) {
 
             // TODO your code here
 
-            counter++;
-            if (counter>8)
-                counter=0;
-            if (counter<2)
-                return Direction.BOMBANDUP;
-            if (counter<4)
-                return Direction.BOMBANDLEFT;
-            if (counter<6)
-                return Direction.BOMBANDDOWN;
-            if (counter<8)
-                return Direction.BOMBANDRIGHT;
+            return Direction.DOWN;
 
         }
     };
