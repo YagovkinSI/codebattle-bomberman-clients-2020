@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/CodeBattleNet/.vs/Bomberman/v16
+/CodeBattleNet/Bomberman.Api/bin/Debug
+/CodeBattleNet/Demo/bin/Debug
+/CodeBattleNet/Bomberman.Api/obj/Debug
+/CodeBattleNet/Demo/obj/x86/Debug

@@ -28,7 +28,7 @@ namespace Demo
 	{
 
 		// you can get this code after registration on the server with your email
-		static string ServerUrl = "http://serverurl/codenjoy-contest/board/player/123jhhskdkasjdh1?code=1234567890&gameName=bomberman";
+		static string ServerUrl = "http://codebattle2020s1.westeurope.cloudapp.azure.com/codenjoy-contest/board/player/w4nanobg8cfz4f0ech3m?code=3544352862064010296&gameName=bomberman";
 
 		static void Main(string[] args)
 		{
