@@ -26,9 +26,8 @@ namespace Demo
 {
 	class Program
 	{
-
-		// you can get this code after registration on the server with your email
-		static string ServerUrl = "http://codebattle2020s1.westeurope.cloudapp.azure.com/codenjoy-contest/board/player/w4nanobg8cfz4f0ech3m?code=3544352862064010296&gameName=bomberman";
+		// Сюда необходимо вставлять строку из адресной строки браузера, после того, как вы авторизуетесь на игровом сервере
+		static string ServerUrl = "http://codebattle2020s1.westeurope.cloudapp.azure.com/codenjoy-contest/board/player/w4nanobg8cfz4f0ech3m?code=3544352862064010296";
 
 		static void Main(string[] args)
 		{

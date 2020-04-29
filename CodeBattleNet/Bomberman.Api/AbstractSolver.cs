@@ -61,7 +61,6 @@ namespace Bomberman.Api
 		public void Play()
 		{
 			_gameServer = new WebSocket(_webSocketUrl);
-			_gameServer.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls12;
 
 			_gameServer.OnMessage += Socket_OnMessage;
 			_gameServer.OnClose += async (s, e) => await ReconnectAsync(e.WasClean, e.Code);
