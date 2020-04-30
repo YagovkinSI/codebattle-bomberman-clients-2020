@@ -10,7 +10,6 @@ namespace Demo
     public class BlastAnaliser
     {
         private Board board;
-        private List<Point> myBombs;
 
         public List<Point> BoomNextTickMy = new List<Point>();
         public List<Point> BoomNextTickAll = new List<Point>();
@@ -27,101 +26,41 @@ namespace Demo
         public List<Point> BoomFifthTickMy = new List<Point>();
         public List<Point> BoomFifthTickAll = new List<Point>();
 
+        public Tuple<Element, bool, List<Point>>[] BlastAnaliserDict;
+
         public BlastAnaliser()
         {
-            
+            BlastAnaliserDict = new[]
+            {
+                Tuple.Create(Element.BOMB_TIMER_1, true, BoomNextTickMy),
+                Tuple.Create(Element.BOMB_TIMER_1, false, BoomNextTickAll),
+                Tuple.Create(Element.BOMB_TIMER_2, true, BoomSecondTickMy),
+                Tuple.Create(Element.BOMB_TIMER_2, false, BoomSecondTickAll),
+                Tuple.Create(Element.BOMB_TIMER_3, true, BoomThirdTickMy),
+                Tuple.Create(Element.BOMB_TIMER_3, false, BoomThirdTickAll),
+                Tuple.Create(Element.BOMB_TIMER_4, true, BoomFourthTickMy),
+                Tuple.Create(Element.BOMB_TIMER_4, false, BoomFourthTickAll),
+                Tuple.Create(Element.BOMB_TIMER_5, true, BoomFifthTickMy),
+                Tuple.Create(Element.BOMB_TIMER_5, false, BoomFifthTickAll)
+            };
+
         }
 
         public void Execute(Board board, List<Point> myBombs)
         {
             this.board = board;
-            this.myBombs = myBombs;
 
-            BoomNextTickMy.Clear();
-            BoomNextTickAll.Clear();
-            BoomSecondTickMy.Clear();
-            BoomSecondTickAll.Clear();
-            BoomThirdTickMy.Clear();
-            BoomThirdTickAll.Clear();
-            BoomFourthTickMy.Clear();
-            BoomFourthTickAll.Clear();
-            BoomFifthTickMy.Clear();
-            BoomFifthTickAll.Clear();
+            foreach (var tuple in BlastAnaliserDict)
+                tuple.Item3.Clear();
 
-            //проверяем свои бомбы которые взорвуться на следующем ходу
-            var bombs = board
-                .Get(Element.BOMB_TIMER_1)
-                .Where(myBombs.Contains);
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomNextTickMy);
-
-            //проверяем чужие бомбы которые взорвуться на следующем ходу
-            bombs = board
-                .Get(Element.BOMB_TIMER_1)
-                .Where(p => !myBombs.Contains(p));
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomNextTickAll);
-
-
-            //проверяем свои бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_2)
-                .Where(myBombs.Contains);
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomSecondTickMy);
-
-
-            //проверяем чужие бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_2)
-                .Where(p => !myBombs.Contains(p));
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomSecondTickAll);
-
-            //проверяем свои бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_3)
-                .Where(myBombs.Contains);
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomThirdTickMy);
-
-
-            //проверяем чужие бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_3)
-                .Where(p => !myBombs.Contains(p));
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomThirdTickAll);
-
-            //проверяем свои бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_4)
-                .Where(myBombs.Contains);
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomFourthTickMy);
-
-
-            //проверяем чужие бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_4)
-                .Where(p => !myBombs.Contains(p));
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomFourthTickAll);
-
-            //проверяем свои бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_5)
-                .Where(myBombs.Contains);
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomFifthTickMy);
-
-
-            //проверяем чужие бомбы которые взорвуться через ход
-            bombs = board
-                .Get(Element.BOMB_TIMER_5)
-                .Where(p => !myBombs.Contains(p));
-            foreach (var bombPoint in bombs)
-                FillBlast(bombPoint, ref BoomFifthTickAll);
+            foreach (var tuple in BlastAnaliserDict)
+            {
+                var bombs = board
+                .Get(tuple.Item1)
+                .Where(p => myBombs.Contains(p) == tuple.Item2);
+                foreach (var bombPoint in bombs)
+                    FillBlast(bombPoint, tuple);
+            }
         }
 
         private bool IsAnyListContains(Point point)
@@ -138,10 +77,10 @@ namespace Demo
                 BoomFifthTickAll.Contains(point);
         }
 
-        private void FillBlast (Point bombPoint, ref List<Point> list)
+        private void FillBlast (Point bombPoint, Tuple<Element, bool, List<Point>> tuple)
         {
             if (!IsAnyListContains(bombPoint))
-                list.Add(bombPoint);
+                tuple.Item3.Add(bombPoint);
             else return;
             foreach (var direction in Helper.AllDirections)
             {                
@@ -157,16 +96,16 @@ namespace Demo
                     {
                         if (IsAnyListContains(blastPoint))
                             break;
-                        FillBlast(blastPoint, ref list);
+                        FillBlast(blastPoint, tuple);
                     }
                     if (Helper.WallElements.Contains(element))
                     {
                         if (!IsAnyListContains(blastPoint))
-                            list.Add(blastPoint);
+                            tuple.Item3.Add(blastPoint);
                         break;
                     }
                     if (!IsAnyListContains(blastPoint))
-                        list.Add(blastPoint);
+                        tuple.Item3.Add(blastPoint);
                     currPoint = blastPoint;
                     range++;
                 }

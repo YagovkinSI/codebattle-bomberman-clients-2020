@@ -31,7 +31,6 @@ namespace Demo
     /// </summary>
     internal class YourSolver : AbstractSolver
     {
-
         private Point myPosition;
 
         private List<Point> myBombs = new List<Point>();
@@ -43,6 +42,7 @@ namespace Demo
         private Point? trySetBombPoint = null;
 
         private BlastAnaliser blastAnaliser = new BlastAnaliser();
+        private BFS bfs = new BFS();
 
         private Dictionary<Direction, int> potentalMoves = new Dictionary<Direction, int>(5);
 
@@ -127,6 +127,22 @@ namespace Demo
                 var key = potentalMoves.Keys.ToArray()[i];
                 potentalMoves[key] = CalcPotentialMove(key);
             }
+
+            //находим оптимальный маршрут до ближайшей цели
+            var path = bfs.Execute(board, myPosition);
+            if (path.Count > 1)
+            {
+                var firstStepPosition = path.ElementAt(1);
+                var direction = firstStepPosition.X == myPosition.X
+                    ? firstStepPosition.Y > myPosition.Y
+                        ? Direction.Up
+                        : Direction.Down
+                    : firstStepPosition.X > myPosition.X
+                        ? Direction.Right
+                        : Direction.Left;
+                potentalMoves[direction] += 35;
+            }
+            
         }
 
         private int CalcPotentialMove(Direction direction)
@@ -148,8 +164,8 @@ namespace Demo
 
             //проверяем не займут ли эту клетку другие игроки или призраки
             delta = CheckAlienMoves(position);
-            potentialScore += delta;
-            
+            potentialScore += delta;            
+
             return potentialScore;
         }
 
@@ -169,17 +185,17 @@ namespace Demo
                     return -10000; //нельзя переместится или 100% смерть
 
                 case Element.MEAT_CHOPPER:
-                    return -1200; //очень опасное перемещение
+                    return -800; //очень опасное перемещение
 
                 case Element.OTHER_BOMBERMAN:
-                    return -150; //есть вероятность что перемещение не пройдёт
+                    return -200; //есть вероятность что перемещение не пройдёт
 
                 case Element.Space:
                     return 0; //свободная позиция
 
                 case Element.BOMB_BOMBERMAN:
                 case Element.BOMBERMAN:
-                    return -3; //стоять на месте не прикольно
+                    return -5; //стоять на месте не прикольно
 
                 default:
                 case Element.BOOM:
@@ -187,7 +203,7 @@ namespace Demo
                 case Element.DEAD_BOMBERMAN:
                 case Element.DestroyedWall:
                 case Element.OTHER_DEAD_BOMBERMAN:
-                    return -1; //есть вероятность что перемещение не пройдёт
+                    return -20; //есть вероятность что перемещение не пройдёт
             }
         }
 
@@ -196,11 +212,11 @@ namespace Demo
             if (blastAnaliser.BoomNextTickAll.Contains(position) || blastAnaliser.BoomNextTickMy.Contains(position))
                 return -10000;
             if (blastAnaliser.BoomSecondTickAll.Contains(position) || blastAnaliser.BoomSecondTickMy.Contains(position))
-                return -50;
+                return -150;
             if (blastAnaliser.BoomThirdTickAll.Contains(position) || blastAnaliser.BoomThirdTickMy.Contains(position))
-                return -20;
+                return -50;
             if (blastAnaliser.BoomFourthTickAll.Contains(position) || blastAnaliser.BoomFourthTickMy.Contains(position))
-                return -10;
+                return -20;
             if (blastAnaliser.BoomFifthTickAll.Contains(position) || blastAnaliser.BoomFifthTickMy.Contains(position))
                 return -5;
             return 0;
@@ -218,7 +234,7 @@ namespace Demo
                 switch(element)
                 {
                     case Element.MEAT_CHOPPER:
-                        delta -= 1000; //очень опасно
+                        delta -= 700; //очень опасно
                         break;
                     case Element.OTHER_BOMBERMAN:
                     case Element.OTHER_BOMB_BOMBERMAN:
@@ -307,13 +323,6 @@ namespace Demo
             //ставим
             return true;
         }
-
-        private bool IsAlienBomb(Point point)
-        {
-            var element = board.GetAt(point);
-            return !myBombs.Contains(point) && element != Element.BOMB_BOMBERMAN && Helper.BombElements.Contains(element);
-        }
-
     }
 }
 
